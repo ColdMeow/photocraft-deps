@@ -1,0 +1,28 @@
+cargo-nextest Windows x64 prebuilt for PhotoCraft GPU nextest isolation
+version: cargo-nextest 0.9.151
+tag: cargo-nextest-0.9.151
+commit: 6b3f994577a98874a2e0ea5bef77fbbab3434044
+release: https://github.com/nextest-rs/nextest/releases/tag/cargo-nextest-0.9.151
+download URL: https://github.com/nextest-rs/nextest/releases/download/cargo-nextest-0.9.151/cargo-nextest-0.9.151-x86_64-pc-windows-msvc.zip
+stable URL: https://get.nexte.st/0.9.151/windows  (redirects to the same GitHub asset)
+platform: x86_64-pc-windows-msvc
+official zip SHA-256 (GitHub Releases asset digest and sidecar): ba35ee0ce14ace65cd8c7aaa9613adb7d2644b0fe3866e85131eb4c269786efb
+official zip BLAKE2 (sidecar): e88b0629658954f8c6cada38c3f951db98b786e0e31e233b5dc8dabf026debfbf27b26da5328ec9f0c99ae49373638c458e14a73903072d79f47445931602285
+zip size: 7742039 bytes (downloaded and verified, not retained in tools/ to avoid extra bulk; exe extracted)
+extracted member: cargo-nextest.exe
+cargo-nextest.exe size: 20302640 bytes
+cargo-nextest.exe SHA-256: f190b90a97bddabb39ebcc0db332444779b5f2fdd516b6484962a5c7f4da5c74
+sidecar files retained:
+  cargo-nextest-0.9.151-x86_64-pc-windows-msvc.sha256 (233 bytes, file SHA-256 6cb56c67e36c31f9f7e407dc86192ddafb8b4687df810bc51b85311b0a0f7edb)
+  cargo-nextest-0.9.151-x86_64-pc-windows-msvc.b2 (361 bytes, file SHA-256 7f18e5938bd26cad028aec7ae7f8d97ff235da0da23cf6d2146103f285c63b06)
+sidecar contents:
+e51bdb4b5883df48f335381b287378edb244318fac65ae0adaf6b9e69298246b *cargo-nextest-0.9.151-x86_64-pc-windows-msvc.tar.gz
+ba35ee0ce14ace65cd8c7aaa9613adb7d2644b0fe3866e85131eb4c269786efb *cargo-nextest-0.9.151-x86_64-pc-windows-msvc.zip
+
+2ce8be314c9e4618dfb0b4925bcb4663049c588af3b33b647b9cd87138274945434cb599cb13bc81c0eccfe8b698f0007cac51ea46807912853219304f9c205b *cargo-nextest-0.9.151-x86_64-pc-windows-msvc.tar.gz
+e88b0629658954f8c6cada38c3f951db98b786e0e31e233b5dc8dabf026debfbf27b26da5328ec9f0c99ae49373638c458e14a73903072d79f47445931602285 *cargo-nextest-0.9.151-x86_64-pc-windows-msvc.zip
+
+licenses: licenses/cargo-nextest-0.9.151/ (Apache-2.0 OR MIT from tag cargo-nextest-0.9.151)
+not compiled from source; official prebuilt zip used
+not executed in this prep step
+files >90MiB: none

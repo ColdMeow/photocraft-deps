@@ -1,0 +1,41 @@
+# SPDX-FileCopyrightText: 2017 - 2026 Luna Borowska <luna@borowska.pw>
+# SPDX-FileCopyrightText: 2021 Alex Sayers <alex@asayers.com>
+#
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
+[package]
+name = "enum-map"
+version = "3.1.0"
+authors = ["Luna Borowska <luna@borowska.pw>"]
+edition = "2024"
+rust-version = "1.95"
+repository = "https://codeberg.org/sugar700/enum-map"
+license = "MIT OR Apache-2.0"
+description = "A map with C-like enum keys represented internally as an array"
+keywords = ["data-structure", "no_std", "enum"]
+categories = ["data-structures", "no-std"]
+documentation = "https://docs.rs/enum-map"
+readme = "README.md"
+
+[dependencies]
+arbitrary = { version = "1.4.2", optional = true }
+bytemuck = { version = "1.25.2", optional = true }
+enum-map-derive = { version = "1.0.0", path = "../enum-map-derive", optional = true }
+serde = { version = "1.0.229", optional = true, default-features = false }
+
+[dev-dependencies]
+bincode = { version = "2.0.1", features = ["serde"] }
+enum-map-derive = { path = "../enum-map-derive" }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_test = "1.0.177"
+serde_json = "1.0.151"
+
+[package.metadata.docs.rs]
+features = ["arbitrary", "bytemuck", "serde"]
+
+[features]
+default = ["derive"]
+arbitrary = ["dep:arbitrary"]
+bytemuck = ["dep:bytemuck"]
+derive = ["dep:enum-map-derive"]
+serde = ["dep:serde"]

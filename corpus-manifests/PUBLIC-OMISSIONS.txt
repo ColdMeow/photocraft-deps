@@ -1,0 +1,59 @@
+PUBLIC-OMISSIONS
+corpus: psd (mixed)
+reason: ag-psd/LICENSE carves out image and brush files from the MIT grant; public redistribution permission is uncertain.
+action: not copied into photocraft-deps/corpus; not published. LICENSE retained at corpus/psd/ag-psd/LICENSE.
+source manifest: xtask/psd-corpus.sha256 (official c6af3dcb / qx 5e7e9223, identical)
+count: 51
+format: <sha256>  <manifest-relative-path>
+
+bb9d161b20b1f5f24fb8db6b24bf4034e76e29205f38ca2641890226a892f6d0  ag-psd/layer-mask/src.psd
+b329cc9b04e5b9b308bda7557961e4c21186d385606f04af105b46ad073e44a8  ag-psd/multiple-strokes-test.psd
+51f676709d87726ea59b1a6e1fb9bf0e540ba470319c9ff2e5f02693b62affeb  ag-psd/read-write/animation-effects/expected.psd
+1bbbf190934791516a3829a749495b8d16258ac090e621534679552e8cf6f300  ag-psd/read-write/animation-effects/src.psd
+5ae1b6c65fad86dea482f20a5b722eb109b773aef7199d3e7eea76349cdb232f  ag-psd/read-write/animation-frame/expected.psd
+86e93b139ef112152aeeb39477f0f7ae7f436674ae4ba7195919d3403a18d28e  ag-psd/read-write/animation-frame/src.psd
+06955743d0c232c29fa52de31c19eebc60d8447e4735b44faea4933bdc38219d  ag-psd/read-write/animation-offset/expected.psd
+f68e42a1e2b1df4069e9d756cb474893d76ee7d1ce1a7b230461a3a2abca44e5  ag-psd/read-write/animation-offset/src.psd
+9ef472c91e42cdccd78a4ee08511d116e4c34b4b3d75afe7129ae1dc3e065c72  ag-psd/read-write/annotations/expected.psd
+17f9d5be6fafb980495848667e77a62fc33c73ae7fd9faea6dc16749c56a1582  ag-psd/read-write/annotations/src.psd
+9a360d71f69fcfb901e01f558d7638ce352884a9025a2c14629246771020774e  ag-psd/read-write/boolean/expected.psd
+941fe47b3af7e7dcb8b0fa9e6bd75672be50168d5dc904f6559e024f890747de  ag-psd/read-write/boolean/src.psd
+e98a9d05d92e3a9a4f9a0ae1d6f1d1a78dcc01e1c96f2ba11efbc44940f78e23  ag-psd/read-write/effects/expected.psd
+1b28aca32edab6afe254fa5cec3c3f2179a123a8c2b49dc1cd92b3c2acd49a0b  ag-psd/read-write/effects/src.psd
+b16b8dd8034af1d446fa533afe47b7cf63a4d0e340394789d0ec29154efb9411  ag-psd/read-write/float-color/expected.psd
+021a92686011e5a23d51991ebb8e6c226a3d071783375d6478d933b041e92f2d  ag-psd/read-write/float-color/src.psd
+8852ec5a6bde2953aa50fd1fb7e2548d966c65c6b8394af2981c7df440b63fdd  ag-psd/read-write/gradient-mode/expected.psd
+142bb1bfa5c8b7e0914ea96fecac69c51de9a25171b60808440d9ce626c851ff  ag-psd/read-write/gradient-mode/src.psd
+eaec5ddbf1d5edfdd8293356e585eeb73cad767aecb87d8a5913a7a5a574fcae  ag-psd/read-write/gradient/expected.psd
+d1661f020de3782c472e74baf5d39e91835db35eb5e63adaae2b4ee3da8b23e5  ag-psd/read-write/gradient/src.psd
+55e5378f46ed78216c8abd8ab29631fa2cc54fb748e06becc3740cc6086d4179  ag-psd/read-write/group-blend/expected.psd
+fa6dda1e79536531539272454b8dc35fffcf03b5c0f67e01ea330fb1171546f1  ag-psd/read-write/group-blend/src.psd
+1d268b34c5ca924b49debb5d42449aef77b55bdaf1ae0aa3a1b65dfc409f79c8  ag-psd/read-write/layer-comps/expected.psd
+d6b4daeed5856d1fcfd6f4ae72cf10c9ac91a415d6e9db26da483027b6ded366  ag-psd/read-write/layer-comps/src.psd
+ce7f28490463306de466a6d2691b4a2510861b7cbff8d0f2b1243c2540f384b9  ag-psd/read-write/masks/expected.psd
+bdb6c9d5b5c659086f9659f4cb5a35d5357b52fdf9ff12e7c3c872277f4f0204  ag-psd/read-write/masks/src.psd
+70f7887ae01307c1546682fe5c6319125a36758fc7cccfbf5948d8e72de358c9  ag-psd/read-write/psb2/expected.psb
+3aae71e57e7e6044c3df63ee9292151007eec7e63c44587e79c607d0eda34449  ag-psd/read-write/psb2/src.psb
+3fb263f93035a976d07f905a884606078cb905d4d0ba7e32384e184967218ebc  ag-psd/read-write/round/expected.psd
+d6e1b3b9a9ca2fe7fefefc1b1608d259eb88e2fcf6ee824650855e068e87ef2a  ag-psd/read-write/round/src.psd
+31c406e80386d3bf189c0fa8bac0ab2dc56f013bba8ea939457e5daf821dd5c6  ag-psd/read-write/shapes/expected.psd
+e6ce955cdcbf12e8dca78572734098404d3b8456dab32616ac2631fcb333f7b4  ag-psd/read-write/shapes/src.psd
+2738c29bf233203325762ebfe61de977185d8318b2d93f3905c19a21bd88978c  ag-psd/read-write/stroke/expected.psd
+259b17a593b760630a3078bfd45d334bb9d2e7092cf3ec3c8427d246e764a4db  ag-psd/read-write/stroke/src.psd
+32d2504653a8f62f5d027de2b205bcf17f166eea82eda942ede765bdacaa22fb  ag-psd/read-write/strokes/expected.psd
+5bc7e774b6b5245678576cbfbc6d910d31599cb922cd763a10f16a38e8f3789e  ag-psd/read-write/strokes/src.psd
+0c59e83ebe706f2231760a598daceb754012aa587a295d69f233439befd83066  ag-psd/read-write/text-box/expected.psd
+5e93866dddc6407b8f985471b00932327c11d400dab3519f70d89570ec511681  ag-psd/read-write/text-box/src.psd
+7edb0fe9605a0e4f04fc46d9e06934f773b271b9217846498ee34a660a241c6d  ag-psd/read-write/text/expected.psd
+20a45f99e4a07a1377e29735b5bbba41d2d6167065c568e05e54142dfb303887  ag-psd/read-write/text/src.psd
+16e7507b1be7c994aed009aae5109817bc380af5bc7798eb98e480a11b0bfc16  ag-psd/read-write/vector-and-mask/expected.psd
+a654955ae0680252123eba20e541b74b4324caa4e6c84c896467a1f399335b99  ag-psd/read-write/vector-and-mask/src.psd
+24a17fc2239ee1a4e5442ef41c42ded12dd805f1a4b37f7189515a4f850a3765  ag-psd/read-write/winding-non-zero/expected.psd
+3331bfb5dd9712d1666874fa5b797ad6debc3b8587674126220a6a5d1fa4eb76  ag-psd/read-write/winding-non-zero/src.psd
+bf81d8dbcfea45aab06e8bd97702fc7deb7cf793adb4de1d68131832f9c8ed92  ag-psd/read/alpha-composite/src.psd
+1bbbf190934791516a3829a749495b8d16258ac090e621534679552e8cf6f300  ag-psd/read/animation-effects/src.psd
+b7f467529c585537fd982ab9c0879b18b0d05340e72b06d705b324c11fb00d25  ag-psd/read/effects/src.psd
+2effae19315366cfec32ec555b28dce48e0d431921df01b612bb46a6acf731bb  ag-psd/read/gradient-overlay-2/src.psd
+d1661f020de3782c472e74baf5d39e91835db35eb5e63adaae2b4ee3da8b23e5  ag-psd/read/gradient/src.psd
+a9083a424b939d42e6fe3d3f27da676d7ea63dc86a469d368fcbd6d5f017cfcd  ag-psd/read/group-drop-shadows/src.psd
+95550bb019db61fe35a9d8f524d37d0ac334f8278dc04589bc49ee2516779612  ag-psd/write/effects/expected.psd

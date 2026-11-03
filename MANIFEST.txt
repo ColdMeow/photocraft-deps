@@ -1,0 +1,37 @@
+purpose: PhotoCraft intranet offline build inputs
+source: Method B; union of the two fixed source workspaces plus public unused Git patch inputs
+exact intranet merge: 53f9ec58cb18d729ae43d2eff3ddab8e62c969be (NOT obtained or verified; bundle unavailable)
+product: 5e7e9223d35c6104fc58103666edfe0ac07b8bad
+upstream: c6af3dcb98b17ceeb38dbf9fd200e6a684a088f1 (official 0.20.1)
+product Cargo.lock sha256: 9fa8e22e113ef695c062b82b61db850a8e1df8e456618f56a75e781f236e7039
+upstream Cargo.lock sha256: efdbd2dc6cf62fee9a39a939b50c72ab9847899225210cdc96436262c631a03b
+locked: yes; both application lockfiles unchanged; no Cargo.lock.updated required
+vendor: 907 versioned packages; 43826 package files checked against .cargo-checksum.json; zero mismatches
+vendor config: original cargo vendor stdout, absolute preparation path; change directory after mirroring
+supplemental inputs: preparation/patch-inputs; public egui_demo_lib, egui_inspection, egui_system_font_provider
+initial check: missing unused egui Git patch packages under empty CARGO_HOME; repaired by supplemental vendor graph; final errors none
+offline check product desktop+CLI HEIF: passed (exit 0)
+offline check product workspace all-targets: passed (exit 0)
+offline check official desktop+CLI HEIF: passed (exit 0)
+offline check official workspace all-targets: passed (exit 0)
+offline mode: --frozen --offline; CARGO_NET_OFFLINE=true; separate initially empty CARGO_HOME; source replacement points only to vendor
+checks are compilation checks, not full tests or runtime acceptance of the intranet merge
+rustc: rustc 1.99.1 (58cf8f9c3 2026-10-13)
+cargo: cargo 1.99.1 (5f94df478 2026-08-27)
+host: x86_64-pc-windows-msvc
+wasm32 std: Rust 1.99.1; all 54 component files byte-identical to installed sysroot
+wasm32 smoke: isolated sysroot made from delivered component; rustc --target wasm32-unknown-unknown succeeds; generated module passes WebAssembly.validate
+cargo-nextest: cargo-nextest 0.9.151 (6b3f99457 2026-11-02); official Windows x64 prebuilt; --version executed successfully
+nextest exe sha256: f190b90a97bddabb39ebcc0db332444779b5f2fdd516b6484962a5c7f4da5c74
+corpus: PARTIAL; 982/1033 pinned manifest assets delivered and hash verified
+corpus omission: 51 ag-psd image files excluded from PUBLIC distribution due explicit image/brush license carve-out; see corpus-manifests/PUBLIC-OMISSIONS.txt
+corpus pins: product and official pin source and all ten sha256 manifests byte-identical
+craft-fonts: not included; supplied separately through company mirror per request
+licenses: preserved per vendored package/corpus; Rust/nextest notices under licenses/
+private workspace source/bundle/credentials/business assets: NOT included
+repository: https://github.com/ColdMeow/photocraft-deps
+visibility: public
+Git LFS: not used
+newline policy: .gitattributes * -text; core.autocrlf=false
+prepared: 2026-11-03
+payload checksums: SHA256SUMS.txt (excludes itself and .git)

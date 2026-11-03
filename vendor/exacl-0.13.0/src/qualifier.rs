@@ -1,0 +1,271 @@
+//! Implements the `Qualifier` type for internal use
+
+use crate::failx::*;
+use crate::unix;
+use std::fmt;
+use std::io;
+#[cfg(target_os = "macos")]
+use uuid::Uuid;
+
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
+const OWNER_NAME: &str = "";
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
+const OTHER_NAME: &str = "";
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
+const MASK_NAME: &str = "";
+#[cfg(target_os = "freebsd")]
+const EVERYONE_NAME: &str = "";
+
+/// A Qualifier specifies the principal that is allowed/denied access to a
+/// resource.
+#[derive(Debug, PartialEq, Eq)]
+pub enum Qualifier {
+    User(unix::uid_t),
+    Group(unix::gid_t),
+
+    #[cfg(target_os = "macos")]
+    Guid(Uuid),
+
+    #[cfg(any(target_os = "linux", target_os = "freebsd"))]
+    UserObj,
+    #[cfg(any(target_os = "linux", target_os = "freebsd"))]
+    GroupObj,
+    #[cfg(any(target_os = "linux", target_os = "freebsd"))]
+    Other,
+    #[cfg(any(target_os = "linux", target_os = "freebsd"))]
+    Mask,
+    #[cfg(target_os = "freebsd")]
+    Everyone,
+
+    Unknown(String),
+}
+
+impl Qualifier {
+    /// Create qualifier object from a GUID.
+    #[cfg(target_os = "macos")]
+    pub fn from_guid(guid: Uuid) -> io::Result<Qualifier> {
+        let qualifier = match unix::guid_to_id(guid)? {
+            (Some(uid), None) => Qualifier::User(uid),
+            (None, Some(gid)) => Qualifier::Group(gid),
+            (None, None) => Qualifier::Guid(guid),
+            _ => unreachable!("guid_to_id bug"),
+        };
+
+        Ok(qualifier)
+    }
+
+    /// Create qualifier object from a user name.
+    #[cfg(target_os = "macos")]
+    pub fn user_named(name: &str) -> io::Result<Qualifier> {
+        match unix::name_to_uid(name) {
+            Ok(uid) => Ok(Qualifier::User(uid)),
+            Err(err) => {
+                // Try to parse name as a GUID.
+                Uuid::parse_str(name).map_or(Err(err), Qualifier::from_guid)
+            }
+        }
+    }
+
+    /// Create qualifier object from a user name.
+    #[cfg(any(target_os = "linux", target_os = "freebsd"))]
+    pub fn user_named(name: &str) -> io::Result<Qualifier> {
+        match name {
+            OWNER_NAME => Ok(Qualifier::UserObj),
+            s => match unix::name_to_uid(s) {
+                Ok(uid) => Ok(Qualifier::User(uid)),
+                Err(err) => Err(err),
+            },
+        }
+    }
+
+    /// Create qualifier object from a group name.
+    #[cfg(target_os = "macos")]
+    pub fn group_named(name: &str) -> io::Result<Qualifier> {
+        match unix::name_to_gid(name) {
+            Ok(gid) => Ok(Qualifier::Group(gid)),
+            Err(err) => Uuid::parse_str(name).map_or(Err(err), Qualifier::from_guid),
+        }
+    }
+
+    /// Create qualifier object from a group name.
+    #[cfg(any(target_os = "linux", target_os = "freebsd"))]
+    pub fn group_named(name: &str) -> io::Result<Qualifier> {
+        match name {
+            OWNER_NAME => Ok(Qualifier::GroupObj),
+            s => match unix::name_to_gid(s) {
+                Ok(gid) => Ok(Qualifier::Group(gid)),
+                Err(err) => Err(err),
+            },
+        }
+    }
+
+    /// Create qualifier from mask.
+    #[cfg(any(target_os = "linux", target_os = "freebsd"))]
+    pub fn mask_named(name: &str) -> io::Result<Qualifier> {
+        match name {
+            MASK_NAME => Ok(Qualifier::Mask),
+            s => fail_custom(&format!("unknown mask name: {s:?}")),
+        }
+    }
+
+    /// Create qualifier from other.
+    #[cfg(any(target_os = "linux", target_os = "freebsd"))]
+    pub fn other_named(name: &str) -> io::Result<Qualifier> {
+        match name {
+            OTHER_NAME => Ok(Qualifier::Other),
+            s => fail_custom(&format!("unknown other name: {s:?}")),
+        }
+    }
+
+    /// Create qualifier from everyone.
+    #[cfg(target_os = "freebsd")]
+    pub fn everyone_named(name: &str) -> io::Result<Qualifier> {
+        match name {
+            EVERYONE_NAME => Ok(Qualifier::Everyone),
+            s => fail_custom(&format!("unknown everyone name: {s:?}")),
+        }
+    }
+
+    /// Return the GUID for the user/group.
+    #[cfg(target_os = "macos")]
+    pub fn guid(&self) -> io::Result<Uuid> {
+        match self {
+            Qualifier::User(uid) => unix::uid_to_guid(*uid),
+            Qualifier::Group(gid) => unix::gid_to_guid(*gid),
+            Qualifier::Guid(guid) => Ok(*guid),
+            Qualifier::Unknown(tag) => fail_custom(&format!("unknown tag: {tag:?}")),
+        }
+    }
+
+    /// Return the name of the user/group.
+    pub fn name(&self) -> io::Result<String> {
+        let result = match self {
+            Qualifier::User(uid) => unix::uid_to_name(*uid)?,
+            Qualifier::Group(gid) => unix::gid_to_name(*gid)?,
+            #[cfg(target_os = "macos")]
+            Qualifier::Guid(guid) => guid.to_string(),
+            #[cfg(any(target_os = "linux", target_os = "freebsd"))]
+            Qualifier::UserObj | Qualifier::GroupObj => OWNER_NAME.to_string(),
+            #[cfg(any(target_os = "linux", target_os = "freebsd"))]
+            Qualifier::Other => OTHER_NAME.to_string(),
+            #[cfg(any(target_os = "linux", target_os = "freebsd"))]
+            Qualifier::Mask => MASK_NAME.to_string(),
+            #[cfg(target_os = "freebsd")]
+            Qualifier::Everyone => EVERYONE_NAME.to_string(),
+
+            Qualifier::Unknown(s) => s.clone(),
+        };
+
+        Ok(result)
+    }
+}
+
+impl fmt::Display for Qualifier {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Qualifier::User(uid) => write!(f, "user:{uid}"),
+            Qualifier::Group(gid) => write!(f, "group:{gid}"),
+            #[cfg(target_os = "macos")]
+            Qualifier::Guid(guid) => write!(f, "guid:{guid}"),
+            #[cfg(any(target_os = "linux", target_os = "freebsd"))]
+            Qualifier::UserObj => write!(f, "user"),
+            #[cfg(any(target_os = "linux", target_os = "freebsd"))]
+            Qualifier::GroupObj => write!(f, "group"),
+            #[cfg(any(target_os = "linux", target_os = "freebsd"))]
+            Qualifier::Other => write!(f, "other"),
+            #[cfg(any(target_os = "linux", target_os = "freebsd"))]
+            Qualifier::Mask => write!(f, "mask"),
+            #[cfg(target_os = "freebsd")]
+            Qualifier::Everyone => write!(f, "everyone"),
+            Qualifier::Unknown(s) => write!(f, "unknown:{s}"),
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+#[cfg(test)]
+mod qualifier_tests {
+    use super::*;
+
+    /// Retrieve `user_id` and `group_id` of unix entity with specified name.
+    #[cfg(any(target_os = "linux", target_os = "freebsd"))]
+    fn getent(name: &str) -> (u32, u32) {
+        use std::str::FromStr;
+
+        let cmd = std::process::Command::new("getent")
+            .arg("passwd")
+            .arg(name)
+            .output()
+            .expect("Valid command");
+        let out = String::from_utf8(cmd.stdout).expect("Valid utf8");
+        let tokens = out.split(':').collect::<Vec<_>>();
+        assert_eq!(tokens[0], name);
+
+        let user_id = u32::from_str(tokens[2]).expect("Valid uid");
+        let group_id = u32::from_str(tokens[3]).expect("Valid gid");
+
+        (user_id, group_id)
+    }
+
+    #[test]
+    #[cfg(target_os = "macos")]
+    fn test_from_guid() {
+        let user =
+            Qualifier::from_guid(Uuid::parse_str("ffffeeee-dddd-cccc-bbbb-aaaa00000059").unwrap())
+                .ok();
+        assert_eq!(user, Some(Qualifier::User(89)));
+
+        let group =
+            Qualifier::from_guid(Uuid::parse_str("abcdefab-cdef-abcd-efab-cdef00000059").unwrap())
+                .ok();
+        assert_eq!(group, Some(Qualifier::Group(89)));
+
+        let user = Qualifier::from_guid(Uuid::nil()).ok();
+        assert_eq!(user, Some(Qualifier::Guid(Uuid::nil())));
+    }
+
+    #[test]
+    fn test_user_named() {
+        let user = Qualifier::user_named("89").ok();
+        assert_eq!(user, Some(Qualifier::User(89)));
+
+        #[cfg(target_os = "macos")]
+        {
+            let user = Qualifier::user_named("_spotlight").ok();
+            assert_eq!(user, Some(Qualifier::User(89)));
+
+            let user = Qualifier::user_named("ffffeeee-dddd-cccc-bbbb-aaaa00000059").ok();
+            assert_eq!(user, Some(Qualifier::User(89)));
+        }
+
+        #[cfg(any(target_os = "linux", target_os = "freebsd"))]
+        {
+            let (user_id, _) = getent("daemon");
+            let user = Qualifier::user_named("daemon").ok();
+            assert_eq!(user, Some(Qualifier::User(user_id)));
+        }
+    }
+
+    #[test]
+    fn test_group_named() {
+        let group = Qualifier::group_named("89").ok();
+        assert_eq!(group, Some(Qualifier::Group(89)));
+
+        #[cfg(target_os = "macos")]
+        {
+            let group = Qualifier::group_named("_spotlight").ok();
+            assert_eq!(group, Some(Qualifier::Group(89)));
+
+            let group = Qualifier::group_named("abcdefab-cdef-abcd-efab-cdef00000059").ok();
+            assert_eq!(group, Some(Qualifier::Group(89)));
+        }
+
+        #[cfg(any(target_os = "linux", target_os = "freebsd"))]
+        {
+            let (_, group_id) = getent("daemon");
+            let group = Qualifier::group_named("daemon").ok();
+            assert_eq!(group, Some(Qualifier::Group(group_id)));
+        }
+    }
+}

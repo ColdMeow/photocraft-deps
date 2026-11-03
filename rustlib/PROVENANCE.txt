@@ -1,0 +1,12 @@
+rustlib/wasm32-unknown-unknown for PhotoCraft offline wasm builds
+rustc: rustc 1.99.1 (58cf8f9c3 2026-10-13)
+sysroot: D:\dev\rustup\toolchains\stable-x86_64-pc-windows-msvc
+component: rust-std-wasm32-unknown-unknown (installed via rustup target add; not modified)
+copy method: recursive copy of <sysroot>/lib/rustlib/wasm32-unknown-unknown without modifications
+files: 54
+bytes: 103517873
+largest file: lib\libcore-a9f1907fcd7ae78a.rmeta 45402362 bytes
+files >90MiB: none
+libcore rmeta sha256: c59f6a3e451a60ec51eaaaf0742dec71cc7dc126312f2d2761fb54c2a986596a
+licenses: licenses/rust-1.99.1/ (Apache-2.0 OR MIT plus SPDX texts shipped with the toolchain, COPYRIGHT, COPYRIGHT-library.html)
+note: full toolchain COPYRIGHT.html is 13.8MiB HTML and was not copied; library-only COPYRIGHT-library.html is included

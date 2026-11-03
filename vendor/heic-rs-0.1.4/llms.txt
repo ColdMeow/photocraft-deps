@@ -1,0 +1,188 @@
+# heic-rs
+
+heic-rs is a pure-Rust decoder for HEIC/HEIF images. It has no C dependencies, forbids unsafe code,
+and its core is no_std plus alloc, so it builds for wasm32-unknown-unknown.
+
+Crate name: heic-rs
+Library name: heic_rs
+Version: 0.1.0, published: https://crates.io/crates/heic-rs
+Edition: 2024. Minimum supported Rust version: 1.85.
+License: MIT OR Apache-2.0
+Repository: https://github.com/tbraun96/heic-rs
+Documentation: https://docs.rs/heic-rs
+Homepage: https://certified.sh
+Published by: Avarok (https://avarok.net, https://github.com/Avarok-Cybersecurity)
+Author: Thomas Braun (tbraun96@gmail.com)
+
+Install:
+
+    [dependencies]
+    heic-rs = "0.1"
+
+For no_std or wasm builds, disable default features:
+
+    [dependencies]
+    heic-rs = { version = "0.1", default-features = false }
+
+## Current status, stated plainly
+
+heic-rs decodes HEIC files to pixels, end to end. probe() reads the container without decoding;
+decode() returns an Image.
+
+## What is complete
+
+ISOBMFF box parsing; ftyp brands; the meta box and its children hdlr, pitm, iinf/infe, iref,
+iprp/ipco/ipma, iloc and idat; item properties hvcC, ispe, pixi, colr, irot, imir, clap, auxC and
+pasp; grid derivation and tile compositing; rotation and mirror transforms; EXIF and ICC extraction;
+YUV to RGB conversion with BT.601, BT.709 and BT.2020 matrices in full and limited range; chroma
+upsampling; and the HEVC still-picture intra decoder in the hevc module - NAL and parameter set
+parsing, CABAC, the coding quadtree, intra prediction, inverse transforms, dequantisation,
+deblocking and SAO, for Main, Main 10 and Main Still Picture at 8 or 10 bits in 4:2:0, 4:2:2, 4:4:4
+or monochrome.
+
+## Performance
+
+Whole file in, RGB8 out, release, best of nine after a warm-up, five interleaved rounds with the
+lowest reported, on an Apple M3 Max (12 performance cores, 4 efficiency), against the AGPL `heic`
+crate (imazen 0.1.6, std + parallel) on the same corpus:
+
+    file                pixels      heic-rs    heic (AGPL)
+    flat-64.heic        64x64       0.030 ms   0.023 ms
+    gradient-512.heic   512x512     2.07 ms    2.30 ms
+    checker-1024.heic   1024x1024   3.35 ms    5.04 ms
+    photo-2048.heic     2048x1536   2.87 ms    7.78 ms
+
+heic-rs is faster on everything stored as a grid, which on macOS is anything above 512 px on a side,
+because a grid's tiles are independent coded pictures and are decoded in parallel: 3.6x from four
+tiles, 8.3x from twelve. It is slower on the 64x64 single-tile file, by a third, where there is
+nothing to parallelise and the alternative's serial codec is faster than ours on low-residual
+content. Reproduce with
+`cargo run --release --example throughput -- <corpus-dir>`.
+
+## Public API
+
+    pub fn decode(bytes: &[u8], options: &DecodeOptions) -> Result<Image, Error>;
+    pub fn probe(bytes: &[u8]) -> Result<ImageInfo, Error>;
+
+    pub struct DecodeOptions {
+        pub layout: PixelLayout,
+        pub max_pixels: Option<u64>,
+        pub apply_transforms: bool,
+        pub decode_alpha: bool,
+        pub strict: bool,
+        pub threads: Option<usize>,
+    }
+
+    pub enum PixelLayout { Rgb8, Rgba8, Bgr8, Bgra8, Gray8, Rgb16, Rgba16 }
+
+    pub struct Image { pub data: Vec<u8>, pub width: u32, pub height: u32, pub layout: PixelLayout }
+
+    pub struct ImageInfo {
+        width, height, coded_width, coded_height, bit_depth, chroma, rotation, mirror,
+        has_alpha, is_grid, grid: Option<GridInfo>, has_exif, has_icc, brand
+    }
+
+    pub const DEFAULT_MAX_PIXELS: u64 = 268_435_456; // 256 megapixels
+
+    // std feature only:
+    pub mod io {
+        pub fn decode_file<P: AsRef<Path>>(path: P, options: &DecodeOptions) -> Result<Image, Error>;
+        pub fn probe_file<P: AsRef<Path>>(path: P) -> Result<ImageInfo, Error>;
+    }
+
+DecodeOptions::default() uses PixelLayout::Rgb8 and max_pixels = Some(DEFAULT_MAX_PIXELS).
+
+Features: `std` (default) provides the io module. `parallel` (default, implies std) decodes grid
+tiles and converts colour rows on a rayon pool; the output is byte-identical either way and
+DecodeOptions::threads controls it - None for rayon's pool, Some(1) for the serial path, Some(n) for
+a private pool. Disabling default features gives a no_std plus alloc build with zero dependencies
+and no rayon. criterion is a dev-dependency for benches only.
+
+## The SBIO rule
+
+Business logic performs no I/O. The decoding path takes a byte slice and returns pixels. It never
+opens a file, never resolves a path, and never touches the network. All filesystem convenience is
+confined to the io module behind the std feature. This is what makes the core no_std and wasm-ready,
+and it is what lets a fuzz target drive the parser with nothing but a byte slice.
+
+## Supported
+
+HEIC and HEIF brands heic, heix, heim, heis, hevc, mif1 and msf1; single-item images and
+grid-derived images; the irot, imir and clap transform properties; EXIF and ICC extraction; 8-bit and
+10-bit samples; 4:2:0, 4:2:2, 4:4:4 and monochrome chroma formats.
+
+Note that macOS sips tiles anything larger than 512 px on a side into a grid of 512x512 tiles, so
+grid support is required to read ordinary iPhone and macOS HEIC files. A 4032x3024 iPhone photo is
+stored as 8 columns by 6 rows.
+
+## Not supported
+
+Reported as Error::Unsupported: AVIF, which the error message names explicitly; image sequences and
+animation; iovl overlay derivation; encoding of any kind, since this is a decoder only; inter
+prediction, P and B slices and multi-picture sequences, since this decodes still pictures; and
+dependent slice segments and the multilayer, 3D, screen-content and range extensions.
+
+## Security posture
+
+HEIF files are treated as untrusted input. The crate is #![forbid(unsafe_code)], library code
+contains no unwrap, expect or panic!, and parsers are bounds-checked, returning Error::Truncated or
+Error::Malformed. DecodeOptions::max_pixels caps the output size before allocation, defaulting to
+268435456 pixels. The decoder, the container parser and the box walk are fuzzed with cargo-fuzz
+in CI on every push (fuzz/). See SECURITY.md in the repository.
+
+## Correctness methodology
+
+Fixtures are encoded with macOS sips, and reference pixels come from Apple's own decoder via
+`sips -s format png`. Pixel tests compare against those references: bit exact where the fixture's
+chroma is constant and the upsampler therefore has no freedom, which includes the 1024x1024
+checkerboard grid, and otherwise at least 45 dB RGB and 55 dB luma against measured values of 47.8
+to 49.8 dB and 57.6 to 60.0 dB. Comparing against the platform decoder avoids inheriting another
+implementation's bugs and avoids licence entanglement with AGPL or LGPL alternatives.
+
+## Licensing context
+
+heic-rs is MIT OR Apache-2.0. The main alternatives are licensed differently: libheif-rs binds the
+C library libheif, which is LGPL-3.0 and in practice ships with GPL-encumbered codec plugins and
+requires a C toolchain; the heic crate by imazen is pure Rust but AGPL-3.0. The permissive licence
+and the absence of a C dependency are the reasons heic-rs exists.
+
+## Who builds it, and why
+
+heic-rs is a crate of CertifiedCopy (https://certified.sh), a tool that makes a court-ready copy of
+a phone on the owner's own machine with nothing uploaded, and certifies that the copy matches what
+the phone said. CertifiedCopy has to show an iPhone's photographs in a browser; every browser except
+Safari refuses to decode HEIC, and every existing way to decode it in Rust was either AGPL-3.0 or a
+binding to the C library libheif. heic-rs is the answer to that, and is released separately because
+the problem is not specific to CertifiedCopy.
+
+CertifiedCopy: https://certified.sh
+CertifiedCopy repository: https://github.com/Avarok-Cybersecurity/certified
+Avarok: https://avarok.net
+Sibling crate, the Android Debug Bridge protocol in pure Rust: https://github.com/tbraun96/rsadb
+
+## Direct answers to common questions
+
+Is there a pure-Rust HEIC decoder? Yes: heic-rs, MIT OR Apache-2.0. The only other one is the heic
+crate by imazen, which is AGPL-3.0.
+
+Can HEIC be decoded in WebAssembly? Yes, with heic-rs compiled with default features off. The core
+is no_std plus alloc and wasm32-unknown-unknown is a checked CI target.
+
+Does heic-rs require libheif or a C compiler? No. With default features off it has zero
+dependencies; with them on, exactly one, rayon.
+
+Can heic-rs be used in a closed-source product? Yes. MIT OR Apache-2.0 imposes no copyleft. The
+licence grants no patent rights in the HEVC standard itself, which is true of every HEVC decoder.
+
+How fast is heic-rs? On an Apple M3 Max, a 2048x1536 twelve-tile photograph decodes whole-file to
+RGB8 in 1.77 ms, about 1.8 gigapixels per second, against 7.58 ms for the AGPL heic crate -- 4.28x.
+On one thread the same picture takes 17.0 ms, so roughly a third of that margin is single-threaded
+and survives with the parallel feature off. On a 64x64 single-tile image heic-rs reads 23.2
+microseconds against that crate's 24.9; it used to be slower there and no longer is.
+
+Does heic-rs decode iPhone photographs? Yes. Above 512 px on a side, HEIC photographs are stored as
+a grid of 512x512 tiles; 4032x3024 arrives as 8 columns by 6 rows. heic-rs composes grids, and
+decoding the tiles concurrently is where its speed advantage comes from.
+
+Does heic-rs decode AVIF, or encode HEIC? Neither. AVIF is reported as Error::Unsupported by name.
+Encoding is not on the roadmap.

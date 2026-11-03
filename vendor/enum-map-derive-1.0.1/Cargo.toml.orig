@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: 2017 - 2023 Luna Borowska <luna@borowska.pw>
+# SPDX-FileCopyrightText: 2018 hcpl <hcpl.prog@gmail.com>
+#
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
+[package]
+name = "enum-map-derive"
+version = "1.0.1"
+authors = ["Luna Borowska <luna@borowska.pw>"]
+edition = "2024"
+rust-version = "1.95"
+repository = "https://codeberg.org/sugar700/enum-map"
+license = "MIT OR Apache-2.0"
+description = "Macros 1.1 implementation of #[derive(Enum)]"
+keywords = ["data-structure", "no_std", "enum"]
+categories = ["data-structures", "no-std"]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1.0.107"
+quote = "1.0.47"
+syn = { version = "3.0.2", default-features = false, features = ["derive", "parsing", "printing", "proc-macro"] }
+
+[dev-dependencies]
+enum-map = { path = "../enum-map" }
