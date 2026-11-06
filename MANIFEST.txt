@@ -6,7 +6,7 @@ upstream: c6af3dcb98b17ceeb38dbf9fd200e6a684a088f1 (official 0.20.1)
 product Cargo.lock sha256: 9fa8e22e113ef695c062b82b61db850a8e1df8e456618f56a75e781f236e7039
 upstream Cargo.lock sha256: efdbd2dc6cf62fee9a39a939b50c72ab9847899225210cdc96436262c631a03b
 locked: yes; both application lockfiles unchanged; no Cargo.lock.updated required
-vendor: 907 versioned packages; 43826 package files checked against .cargo-checksum.json; zero mismatches
+vendor: 924 versioned packages; 44395 package files checked against .cargo-checksum.json on 2026-11-06; zero mismatches
 vendor config: original cargo vendor stdout, absolute preparation path; change directory after mirroring
 supplemental inputs: preparation/patch-inputs; public egui_demo_lib, egui_inspection, egui_system_font_provider
 initial check: missing unused egui Git patch packages under empty CARGO_HOME; repaired by supplemental vendor graph; final errors none
@@ -33,5 +33,25 @@ repository: https://github.com/ColdMeow/photocraft-deps
 visibility: public
 Git LFS: not used
 newline policy: .gitattributes * -text; core.autocrlf=false
-prepared: 2026-11-03
+prepared: 2026-11-03; updated 2026-11-06
 payload checksums: SHA256SUMS.txt (excludes itself and .git)
+
+2026-11-06 update (prior baseline check records above retained):
+handoff upstream: 2c68cc6b9590f7100417a8f42bca9b9d67c40406 (official 0.20.1)
+handoff Cargo.lock sha256: c57371e359fcd0e822cf34d2c8f52ac5c8c95006d819e7b740b00d51963353e1
+latest queried upstream: 8f7d916ba5ce6d94f2334d47bb23b84ff6cbaff2
+latest Cargo.lock sha256: 7b2e332dd7892905608afea916e8a3abd6af4a7c8ec69c35ed19632ae59df701
+prior interrupted-session snapshot: a259993118ac7ce1d4c828a385abbc3191841e86; Cargo.lock byte-identical to latest queried upstream
+added: 17 registry packages (4 handoff omissions plus 13 current-baseline additions); versions listed in README
+package provenance: added package checksum identities match current official Cargo.lock; upstream licenses retained
+Git dependencies: no revision changes relative to original baseline
+corpus pins: unchanged (normalized line endings); previous 51-file license omission still applies
+Clippy: exact official Rust 1.99.1 Windows x64 component; official archive SHA-256 verified; 8 component files byte-identical to extraction
+Clippy runtime: delivered executable rejects needless_return; corrected minimal crate passes offline (exit 0); not application-wide Clippy acceptance
+handoff desktop+CLI HEIF offline check: passed in prior session (exit 0, retained completion log)
+handoff workspace all-targets offline check: passed with -j 2 (exit 0); prior default-concurrency attempt failed with compiler memory allocation errors
+application sources/lockfiles unchanged; no application merge or release performed
+latest queried upstream desktop+CLI HEIF offline check: passed (exit 0)
+latest queried upstream workspace all-targets offline check: passed (exit 0)
+2026-11-06 checks: --frozen --offline, CARGO_NET_OFFLINE=true, isolated CARGO_HOME, -j 2; unused egui patch warnings remain
+payload: 46442 files plus SHA256SUMS.txt; no file over 90 MiB
